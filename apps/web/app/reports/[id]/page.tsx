@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 import { ReportForm } from "@/components/report-form"
-import { ReportView } from "@/components/report-view"
+import { ReportView, CorrectionBanner } from "@/components/report-view"
 import { useAuth } from "@/lib/auth-context"
 import { apiFetch, ApiError } from "@/lib/api"
 import type { Report } from "@/lib/report-types"
@@ -63,6 +63,7 @@ export default function ReportDetailPage() {
               : "This report is still a draft. Keep editing or submit it for review."}
           </p>
         </div>
+        <CorrectionBanner report={report} />
         <ReportForm
           projects={projects}
           reportId={report._id}

@@ -32,13 +32,26 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
 }
 
-export function ReportView({ report }: { report: Report }) {
-  const project = typeof report.project === "string" ? null : report.project
-  const owner = typeof report.owner === "string" ? null : report.owner
-
+export function CorrectionBanner({ report }: { report: Report }) {
   const lastCorrectionComment = [...report.reviewHistory]
     .reverse()
     .find((r) => r.action === "requested_changes")
+
+  if (report.status !== "needs_correction" || !lastCorrectionComment) return null
+
+  return (
+    <Card className="border-destructive/40">
+      <CardHeader>
+        <CardTitle className="text-destructive">Changes requested</CardTitle>
+        <CardDescription>{lastCorrectionComment.comment}</CardDescription>
+      </CardHeader>
+    </Card>
+  )
+}
+
+export function ReportView({ report }: { report: Report }) {
+  const project = typeof report.project === "string" ? null : report.project
+  const owner = typeof report.owner === "string" ? null : report.owner
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,14 +66,7 @@ export function ReportView({ report }: { report: Report }) {
         <Badge variant={STATUS_VARIANT[report.status]}>{STATUS_LABEL[report.status]}</Badge>
       </div>
 
-      {report.status === "needs_correction" && lastCorrectionComment && (
-        <Card className="border-destructive/40">
-          <CardHeader>
-            <CardTitle className="text-destructive">Changes requested</CardTitle>
-            <CardDescription>{lastCorrectionComment.comment}</CardDescription>
-          </CardHeader>
-        </Card>
-      )}
+      <CorrectionBanner report={report} />
 
       <ReportContentView content={report.content} />
 
