@@ -200,7 +200,7 @@ export function ReportForm({
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="project">Project</Label>
-            <Select value={project} onValueChange={setProject}>
+            <Select value={project} onValueChange={(v) => setProject(v ?? "")}>
               <SelectTrigger id="project" className="w-full" aria-invalid={!!errors.project}>
                 <SelectValue placeholder="Select a project">
                   {(value: string) => projects.find((p) => p._id === value)?.name}
@@ -252,7 +252,7 @@ export function ReportForm({
                   <Label>Priority</Label>
                   <Select
                     value={task.priority}
-                    onValueChange={(v) => updateTask(index, "priority", v)}
+                    onValueChange={(v) => v && updateTask(index, "priority", v)}
                   >
                     <SelectTrigger className="mt-1 w-full">
                       <SelectValue>
@@ -272,7 +272,7 @@ export function ReportForm({
                   <Label>Status</Label>
                   <Select
                     value={task.status}
-                    onValueChange={(v) => updateTask(index, "status", v)}
+                    onValueChange={(v) => v && updateTask(index, "status", v)}
                   >
                     <SelectTrigger className="mt-1 w-full">
                       <SelectValue>

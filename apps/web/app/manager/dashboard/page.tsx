@@ -418,7 +418,7 @@ function FilterSelect({
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium">{label}</span>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value} onValueChange={(v) => onChange(v ?? ALL)}>
         <SelectTrigger className="w-40">
           <SelectValue>
             {(v: string) => (v === ALL ? "All" : options.find((o) => o.value === v)?.label)}
