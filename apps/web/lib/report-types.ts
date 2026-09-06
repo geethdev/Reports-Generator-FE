@@ -36,6 +36,7 @@ export type ReportContent = {
 
 export type ReviewHistoryEntry = {
   reviewer: string
+  versionNumber?: number
   action: "approved" | "requested_changes"
   comment: string
   reviewedAt: string

@@ -19,6 +19,9 @@ import {
 import { AuthLayout } from "@/components/auth-layout"
 import { PasswordInput } from "@/components/password-input"
 import { useAuth, ApiError, type Role } from "@/lib/auth-context"
+import { isValidEmail } from "@/lib/validation"
+
+type Errors = { name?: string; email?: string; password?: string }
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -28,10 +31,23 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [role, setRole] = useState<Role>("team_member")
+  const [errors, setErrors] = useState<Errors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  function validate(): boolean {
+    const next: Errors = {}
+    if (!name.trim()) next.name = "Name is required"
+    if (!email.trim()) next.email = "Email is required"
+    else if (!isValidEmail(email)) next.email = "Enter a valid email address"
+    if (!password) next.password = "Password is required"
+    else if (password.length < 6) next.password = "Password must be at least 6 characters"
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!validate()) return
     setIsSubmitting(true)
 
     try {
@@ -53,7 +69,7 @@ export default function RegisterPage() {
         Register to start submitting or reviewing weekly reports
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="name">Name</Label>
           <Input
@@ -61,9 +77,10 @@ export default function RegisterPage() {
             placeholder="full name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
+            aria-invalid={!!errors.name}
             autoComplete="name"
           />
+          {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">Email</Label>
@@ -73,9 +90,10 @@ export default function RegisterPage() {
             placeholder="email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            aria-invalid={!!errors.email}
             autoComplete="email"
           />
+          {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="password">Password</Label>
@@ -83,9 +101,10 @@ export default function RegisterPage() {
             id="password"
             value={password}
             onChange={setPassword}
-            minLength={6}
             autoComplete="new-password"
+            aria-invalid={!!errors.password}
           />
+          {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="role">Role</Label>

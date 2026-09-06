@@ -31,10 +31,10 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-svh">
-      <header className="flex items-center justify-between border-b px-6 py-4">
-        <div className="flex items-center gap-8">
+      <header className="flex flex-col gap-3 border-b px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <span className="font-semibold">Weekly Reports</span>
-          <nav className="flex gap-4">
+          <nav className="flex flex-wrap gap-4">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -50,8 +50,8 @@ export default function ReportsLayout({ children }: { children: React.ReactNode 
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">{user.name}</span>
+        <div className="flex items-center justify-between gap-4 sm:justify-end">
+          <span className="truncate text-sm text-muted-foreground">{user.name}</span>
           <Button variant="outline" size="sm" onClick={logout}>
             Log out
           </Button>

@@ -12,6 +12,9 @@ import { Label } from "@workspace/ui/components/label"
 import { AuthLayout } from "@/components/auth-layout"
 import { PasswordInput } from "@/components/password-input"
 import { useAuth, ApiError } from "@/lib/auth-context"
+import { isValidEmail } from "@/lib/validation"
+
+type Errors = { email?: string; password?: string }
 
 export default function LoginPage() {
   const router = useRouter()
@@ -19,10 +22,21 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [errors, setErrors] = useState<Errors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  function validate(): boolean {
+    const next: Errors = {}
+    if (!email.trim()) next.email = "Email is required"
+    else if (!isValidEmail(email)) next.email = "Enter a valid email address"
+    if (!password) next.password = "Password is required"
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!validate()) return
     setIsSubmitting(true)
 
     try {
@@ -44,7 +58,7 @@ export default function LoginPage() {
         Enter your email below to log in to your account
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -53,9 +67,10 @@ export default function LoginPage() {
             placeholder="email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            aria-invalid={!!errors.email}
             autoComplete="email"
           />
+          {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="password">Password</Label>
@@ -64,7 +79,9 @@ export default function LoginPage() {
             value={password}
             onChange={setPassword}
             autoComplete="current-password"
+            aria-invalid={!!errors.password}
           />
+          {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
         </div>
         <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
           {isSubmitting ? "Logging in..." : "Login"}

@@ -83,9 +83,16 @@ export function ReportView({ report }: { report: Report }) {
             {report.reviewHistory.map((entry, i) => (
               <div key={i} className="rounded-lg border p-3 text-sm">
                 <div className="flex items-center justify-between">
-                  <Badge variant={entry.action === "approved" ? "default" : "destructive"}>
-                    {entry.action === "approved" ? "Approved" : "Requested changes"}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={entry.action === "approved" ? "default" : "destructive"}>
+                      {entry.action === "approved" ? "Approved" : "Requested changes"}
+                    </Badge>
+                    {entry.versionNumber !== undefined && (
+                      <span className="text-xs text-muted-foreground">
+                        on version {entry.versionNumber}
+                      </span>
+                    )}
+                  </div>
                   <span className="text-muted-foreground">{formatDate(entry.reviewedAt)}</span>
                 </div>
                 {entry.comment && <p className="mt-2 text-muted-foreground">{entry.comment}</p>}

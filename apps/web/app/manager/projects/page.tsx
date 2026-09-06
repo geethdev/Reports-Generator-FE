@@ -74,6 +74,7 @@ export default function ProjectsPage() {
   const { token } = useAuth()
   const [projects, setProjects] = useState<Project[] | null>(null)
   const [form, setForm] = useState(emptyForm)
+  const [nameError, setNameError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Project | null>(null)
@@ -101,11 +102,17 @@ export default function ProjectsPage() {
   function cancelEdit() {
     setEditingId(null)
     setForm(emptyForm)
+    setNameError(null)
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!token) return
+    if (!form.name.trim()) {
+      setNameError("Project name is required")
+      return
+    }
+    setNameError(null)
     setIsSubmitting(true)
 
     try {
@@ -148,7 +155,7 @@ export default function ProjectsPage() {
       </div>
 
       <Card>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <CardHeader>
             <CardTitle>{editingId ? "Edit project" : "New project"}</CardTitle>
             <CardDescription>
@@ -162,8 +169,9 @@ export default function ProjectsPage() {
                 id="name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
+                aria-invalid={!!nameError}
               />
+              {nameError && <p className="text-xs text-destructive">{nameError}</p>}
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="description">Description</Label>

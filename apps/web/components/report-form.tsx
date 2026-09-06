@@ -67,6 +67,22 @@ export function ReportForm({
   const [content, setContent] = useState<ReportContent>(initialContent ?? emptyContent)
   const [isSaving, setIsSaving] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<{ weekStartDate?: string; project?: string; planForNextWeek?: string; tasks?: string }>({})
+
+  function clampPercent(value: number) {
+    if (Number.isNaN(value)) return 0
+    return Math.min(100, Math.max(0, value))
+  }
+
+  function validate(): boolean {
+    const next: typeof errors = {}
+    if (!weekStartDate) next.weekStartDate = "Week starting date is required"
+    if (!project) next.project = "Select a project"
+    if (!content.planForNextWeek.trim()) next.planForNextWeek = "Plan for next week is required"
+    if (content.tasks.some((t) => !t.taskName.trim())) next.tasks = "Every task needs a name (or remove it)"
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
 
   function updateContent<K extends keyof ReportContent>(key: K, value: ReportContent[K]) {
     setContent((c) => ({ ...c, [key]: value }))
@@ -123,6 +139,7 @@ export function ReportForm({
 
   async function handleSaveDraft() {
     if (!token) return
+    if (!validate()) return
     setIsSaving(true)
     try {
       if (reportId) {
@@ -148,6 +165,7 @@ export function ReportForm({
 
   async function handleSubmitForReview() {
     if (!token || !reportId) return
+    if (!validate()) return
     setIsSubmitting(true)
     try {
       await apiFetch(`/reports/${reportId}`, { method: "PUT", token, body: buildPayload() })
@@ -176,13 +194,14 @@ export function ReportForm({
               type="date"
               value={weekStartDate}
               onChange={(e) => setWeekStartDate(e.target.value)}
-              required
+              aria-invalid={!!errors.weekStartDate}
             />
+            {errors.weekStartDate && <p className="text-xs text-destructive">{errors.weekStartDate}</p>}
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="project">Project</Label>
             <Select value={project} onValueChange={setProject}>
-              <SelectTrigger id="project" className="w-full">
+              <SelectTrigger id="project" className="w-full" aria-invalid={!!errors.project}>
                 <SelectValue placeholder="Select a project">
                   {(value: string) => projects.find((p) => p._id === value)?.name}
                 </SelectValue>
@@ -195,6 +214,7 @@ export function ReportForm({
                 ))}
               </SelectContent>
             </Select>
+            {errors.project && <p className="text-xs text-destructive">{errors.project}</p>}
           </div>
         </CardContent>
       </Card>
@@ -286,7 +306,7 @@ export function ReportForm({
                     min={0}
                     max={100}
                     value={task.plannedPercent}
-                    onChange={(e) => updateTask(index, "plannedPercent", Number(e.target.value))}
+                    onChange={(e) => updateTask(index, "plannedPercent", clampPercent(Number(e.target.value)))}
                   />
                 </div>
                 <div>
@@ -297,7 +317,7 @@ export function ReportForm({
                     min={0}
                     max={100}
                     value={task.actualPercent}
-                    onChange={(e) => updateTask(index, "actualPercent", Number(e.target.value))}
+                    onChange={(e) => updateTask(index, "actualPercent", clampPercent(Number(e.target.value)))}
                   />
                 </div>
                 <div>
@@ -323,6 +343,7 @@ export function ReportForm({
               </div>
             </div>
           ))}
+          {errors.tasks && <p className="text-xs text-destructive">{errors.tasks}</p>}
           <Button type="button" variant="outline" onClick={addTask} className="self-start">
             Add task
           </Button>
@@ -338,7 +359,9 @@ export function ReportForm({
             rows={3}
             value={content.planForNextWeek}
             onChange={(e) => updateContent("planForNextWeek", e.target.value)}
+            aria-invalid={!!errors.planForNextWeek}
           />
+          {errors.planForNextWeek && <p className="mt-1 text-xs text-destructive">{errors.planForNextWeek}</p>}
         </CardContent>
       </Card>
 

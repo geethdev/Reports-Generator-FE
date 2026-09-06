@@ -13,6 +13,7 @@ export function PasswordInput({
   minLength,
   className,
   iconClassName,
+  "aria-invalid": ariaInvalid,
 }: {
   id: string
   value: string
@@ -21,6 +22,7 @@ export function PasswordInput({
   minLength?: number
   className?: string
   iconClassName?: string
+  "aria-invalid"?: boolean
 }) {
   const [visible, setVisible] = useState(false)
 
@@ -31,9 +33,9 @@ export function PasswordInput({
         type={visible ? "text" : "password"}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        required
         minLength={minLength}
         autoComplete={autoComplete}
+        aria-invalid={ariaInvalid}
         className={cn("pr-10", className)}
       />
       <button

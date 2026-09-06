@@ -41,8 +41,11 @@ import {
 type Summary = {
   submittedThisWeek: number
   complianceRate: number
+  compliance: { submitted: number; pending: number; late: number }
   needsCorrectionCount: number
   openBlockersCount: number
+  notStartedCount: number
+  notStarted: { _id: string; name: string }[]
 }
 
 type Charts = {
@@ -137,12 +140,36 @@ export default function ManagerDashboardPage() {
         <p className="text-sm text-muted-foreground">Team-wide report activity and status this week.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatCard label="Submitted this week" value={summary?.submittedThisWeek} />
-        <StatCard label="Compliance rate" value={summary ? `${summary.complianceRate}%` : undefined} />
+        <StatCard
+          label="Compliance rate"
+          value={summary ? `${summary.complianceRate}%` : undefined}
+          detail={
+            summary
+              ? `${summary.compliance.submitted} submitted, ${summary.compliance.pending} pending, ${summary.compliance.late} late`
+              : undefined
+          }
+        />
         <StatCard label="Needs correction" value={summary?.needsCorrectionCount} />
         <StatCard label="Open blockers" value={summary?.openBlockersCount} />
+        <StatCard label="Not started this week" value={summary?.notStartedCount} />
       </div>
+
+      {summary && summary.notStarted.length > 0 && (
+        <Card className="border-destructive/40">
+          <CardHeader>
+            <CardTitle className="text-base">Haven&apos;t started this week&apos;s report</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {summary.notStarted.map((member) => (
+              <Link key={member._id} href={`/manager/team/${member._id}`}>
+                <Badge variant="destructive">{member.name}</Badge>
+              </Link>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       {charts && (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -338,12 +365,21 @@ export default function ManagerDashboardPage() {
   )
 }
 
-function StatCard({ label, value }: { label: string; value: string | number | undefined }) {
+function StatCard({
+  label,
+  value,
+  detail,
+}: {
+  label: string
+  value: string | number | undefined
+  detail?: string
+}) {
   return (
     <Card>
       <CardContent className="pt-2">
         <div className="text-xs text-muted-foreground">{label}</div>
         <div className="text-2xl font-bold">{value ?? "—"}</div>
+        {detail && <div className="mt-0.5 text-xs text-muted-foreground">{detail}</div>}
       </CardContent>
     </Card>
   )
