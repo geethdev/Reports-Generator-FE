@@ -255,10 +255,9 @@ export default function ManagerDashboardPage() {
                 setStatusFilter(v)
                 setPage(1)
               }}
-              options={(Object.keys(STATUS_LABEL) as ReportStatus[]).map((s) => ({
-                value: s,
-                label: STATUS_LABEL[s],
-              }))}
+              options={(Object.keys(STATUS_LABEL) as ReportStatus[])
+                .filter((s) => s !== "draft")
+                .map((s) => ({ value: s, label: STATUS_LABEL[s] }))}
             />
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-medium">From</span>

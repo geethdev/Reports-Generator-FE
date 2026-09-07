@@ -25,7 +25,6 @@ import { STATUS_LABEL, type ReportStatus } from "@/lib/report-types"
 
 type Member = { _id: string; name: string; email: string }
 type Stats = {
-  draft: number
   submitted: number
   needs_correction: number
   approved: number
@@ -81,9 +80,8 @@ export default function TeamMemberProfilePage() {
         <p className="text-sm text-muted-foreground">{member.email}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard label="Total reports" value={stats.total} />
-        <StatCard label="Draft" value={stats.draft} />
         <StatCard label="Submitted" value={stats.submitted} />
         <StatCard label="Needs correction" value={stats.needs_correction} />
         <StatCard label="Approved" value={stats.approved} />

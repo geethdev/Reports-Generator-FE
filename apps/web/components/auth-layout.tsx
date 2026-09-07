@@ -1,7 +1,7 @@
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-svh">
-      <div className="flex w-full flex-col justify-center bg-white px-8 py-12 text-neutral-950 sm:px-16 lg:w-[43%]">
+      <div className="force-light flex w-full flex-col justify-center bg-white px-8 py-12 text-neutral-950 sm:px-16 lg:w-[43%]">
         <div className="mx-auto w-full max-w-sm">{children}</div>
       </div>
       <div className="relative hidden overflow-hidden bg-black lg:flex lg:w-[57%] lg:items-center lg:justify-center">
